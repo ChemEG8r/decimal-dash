@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decimal Dash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Atkinson+Hyperlegible:wght@400;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+  :root {
+    --bg: #FDF6F9;
+    --grid: rgba(224, 85, 139, 0.07);
+    --surface: #FFFFFF;
+    --ink: #33202B;
+    --muted: #7A6070;
+    --accent: #E0558B;
+    --accent-soft: rgba(224, 85, 139, 0.11);
+    --on-accent: #FFFFFF;
+    --teal: #12A5A5;
+    --teal-soft: rgba(18, 165, 165, 0.12);
+    --good: #1E8A4C;
+    --good-soft: rgba(30, 138, 76, 0.12);
+    --bad: #D23B3B;
+    --bad-soft: rgba(210, 59, 59, 0.10);
+    --line: #F0DCE5;
+    --shadow: 0 2px 10px rgba(51, 32, 43, 0.07);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1D1218;
+      --grid: rgba(240, 130, 170, 0.05);
+      --surface: #2A1C23;
+      --ink: #F7ECF1;
+      --muted: #BA9FAC;
+      --accent: #F082AA;
+      --accent-soft: rgba(240, 130, 170, 0.14);
+      --on-accent: #1D1218;
+      --teal: #4FD0D0;
+      --teal-soft: rgba(79, 208, 208, 0.14);
+      --good: #4CC97E;
+      --good-soft: rgba(76, 201, 126, 0.14);
+      --bad: #F07A7A;
+      --bad-soft: rgba(240, 122, 122, 0.13);
+      --line: #432E38;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1D1218;
+    --grid: rgba(240, 130, 170, 0.05);
+    --surface: #2A1C23;
+    --ink: #F7ECF1;
+    --muted: #BA9FAC;
+    --accent: #F082AA;
+    --accent-soft: rgba(240, 130, 170, 0.14);
+    --on-accent: #1D1218;
+    --teal: #4FD0D0;
+    --teal-soft: rgba(79, 208, 208, 0.14);
+    --good: #4CC97E;
+    --good-soft: rgba(76, 201, 126, 0.14);
+    --bad: #F07A7A;
+    --bad-soft: rgba(240, 122, 122, 0.13);
+    --line: #432E38;
+    --shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      var(--bg);
+    background-size: 28px 28px, 28px 28px, auto;
+    font-family: "Atkinson Hyperlegible", "Avenir Next", system-ui, sans-serif;
+    font-size: 17px;
+    line-height: 1.5;
+    min-height: 100vh;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 620px; margin: 0 auto; padding: 18px 14px 48px; }
+
+  h1, h2, h3 { font-family: "Baloo 2", system-ui, sans-serif; font-weight: 800; text-wrap: balance; margin: 0; }
+  .mono { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; font-variant-numeric: tabular-nums; }
+
+  .topbar { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 4px 2px 14px; }
+  .brand { font-family: "Baloo 2", system-ui, sans-serif; font-weight: 800; font-size: 22px; }
+  .brand span { color: var(--accent); }
+  .navlink {
+    background: none; border: none; padding: 4px 2px; cursor: pointer;
+    color: var(--teal); font: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 3px;
+  }
+
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 20px 18px; margin-bottom: 14px; }
+
+  .hero h1 { font-size: 28px; line-height: 1.2; }
+  .hero p { color: var(--muted); margin: 10px 0 0; }
+  .topic-list { margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px; }
+  .topic-list li { font-size: 13.5px; font-weight: 700; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 4px 12px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; text-align: center;
+    font: inherit; font-weight: 700; cursor: pointer;
+    border-radius: 14px; padding: 13px 20px; min-height: 52px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    touch-action: manipulation;
+  }
+  .btn:focus-visible, .navlink:focus-visible, input:focus-visible, details summary:focus-visible, .opt:focus-visible {
+    outline: 3px solid var(--teal); outline-offset: 2px;
+  }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); font-size: 17px; }
+  .btn-wide { width: 100%; }
+  .btn-danger { color: var(--bad); }
+  .btn-row { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-row .btn { flex: 1; }
+
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 4px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 11px 13px; }
+  .stat .num { font-family: "IBM Plex Mono", monospace; font-size: 23px; font-weight: 600; }
+  .stat .lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 700; }
+
+  /* ---------- Quiz ---------- */
+  .progress { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 8px 0 10px; }
+  .progress .label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+  .bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  .bar > div { height: 100%; border-radius: 999px; background: var(--accent); transition: width 0.25s ease; }
+  @media (prefers-reduced-motion: reduce) { .bar > div { transition: none; } }
+
+  .qtopic { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--teal); margin-bottom: 8px; }
+  .qtext { font-size: 18px; margin: 0 0 6px; }
+  .qmath { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 26px; font-weight: 600; margin: 10px 0 14px; overflow-x: auto; }
+
+  .opts { display: flex; flex-direction: column; gap: 9px; }
+  .opt {
+    font: inherit; font-size: 16px; font-weight: 700; text-align: left; cursor: pointer;
+    border: 2px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink);
+    padding: 13px 14px; min-height: 52px; touch-action: manipulation;
+  }
+  .opt.right { border-color: var(--good); background: var(--good-soft); color: var(--good); }
+  .opt.wrong { border-color: var(--bad); background: var(--bad-soft); color: var(--bad); }
+  .opt:disabled { cursor: default; opacity: 1; }
+  .opt.dim:disabled { opacity: 0.55; }
+
+  .answer-line { display: flex; gap: 8px; }
+  input.answer {
+    flex: 1; width: 100%; min-height: 54px; padding: 8px 14px;
+    font-family: "IBM Plex Mono", monospace; font-size: 23px; font-weight: 600;
+    color: var(--ink); background: var(--surface);
+    border: 2px solid var(--line); border-radius: 14px;
+  }
+  input.answer::placeholder { color: var(--muted); opacity: 0.6; font-weight: 500; font-size: 16px; font-family: "Atkinson Hyperlegible", sans-serif; }
+  .answer-line .btn { flex: 0 0 auto; }
+
+  .feedback { min-height: 46px; border-radius: 12px; padding: 10px 12px; font-size: 15px; margin-top: 12px; }
+  .feedback.neutral { color: var(--muted); background: var(--surface); border: 1px dashed var(--line); }
+  .feedback.right { color: var(--good); background: var(--good-soft); font-weight: 700; }
+  .feedback.wrong { color: var(--bad); background: var(--bad-soft); font-weight: 700; }
+  .feedback .why { display: block; font-weight: 400; color: var(--ink); margin-top: 4px; }
+
+  /* ---------- Results / history / study ---------- */
+  .score-hero { text-align: center; padding: 26px 18px; }
+  .score-big { font-family: "IBM Plex Mono", monospace; font-size: 54px; font-weight: 600; line-height: 1; }
+  .score-msg { font-family: "Baloo 2", system-ui, sans-serif; font-size: 21px; font-weight: 800; margin-top: 10px; }
+  .score-sub { color: var(--muted); margin-top: 4px; }
+
+  .misslist { margin: 0; padding: 0; list-style: none; }
+  .misslist li { padding: 10px 4px; border-bottom: 1px solid var(--line); font-size: 15px; }
+  .misslist li:last-child { border-bottom: none; }
+  .misslist .q { font-weight: 700; display: block; }
+  .misslist .a { color: var(--bad); font-family: "IBM Plex Mono", monospace; }
+  .misslist .cor { color: var(--good); font-weight: 700; font-family: "IBM Plex Mono", monospace; }
+  .allgood { color: var(--good); font-weight: 700; padding: 10px 4px; }
+
+  .hrow { border-bottom: 1px solid var(--line); }
+  .hrow:last-child { border-bottom: none; }
+  .hrow summary { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 4px; cursor: pointer; list-style: none; }
+  .hrow summary::-webkit-details-marker { display: none; }
+  .hdate { font-size: 15px; flex: 1; }
+  .hdate small { display: block; color: var(--muted); }
+  .hscore { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 14px; color: var(--muted); }
+  .hpct { font-family: "IBM Plex Mono", monospace; font-weight: 600; border-radius: 999px; padding: 4px 11px; font-size: 14px; }
+  .pct-good { color: var(--good); background: var(--good-soft); }
+  .pct-mid  { color: var(--teal); background: var(--teal-soft); }
+  .pct-low  { color: var(--bad); background: var(--bad-soft); }
+  .hdetail { padding: 0 4px 12px; }
+
+  .trouble .tlabel { display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+  .trouble .tlabel .mono { color: var(--muted); font-weight: 600; font-size: 13px; }
+  .tbar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; margin-bottom: 9px; }
+  .tbar > div { height: 100%; border-radius: 999px; background: var(--bad); }
+
+  .study h3 { font-size: 17px; margin: 16px 0 6px; color: var(--accent); }
+  .study h3:first-of-type { margin-top: 0; }
+  .study ul { margin: 0; padding-left: 20px; }
+  .study li { margin-bottom: 5px; font-size: 15.5px; }
+  .study b { color: var(--teal); }
+  .study .em { color: var(--accent); font-weight: 700; }
+
+  .empty { color: var(--muted); text-align: center; padding: 26px 10px; }
+  .footnote { color: var(--muted); font-size: 13px; text-align: center; margin-top: 18px; }
+  #confetti { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">🏁 Decimal <span>Dash</span></div>
+    <button class="navlink" id="navBtn"></button>
+  </div>
+  <div id="app"></div>
+</div>
+<canvas id="confetti" hidden></canvas>
+
+<script>
+"use strict";
+
+/* ================= exact decimal engine (scaled integers, no float math) ================= */
+const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const pick = arr => arr[rnd(0, arr.length - 1)];
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+/* a decimal is {m, p} meaning m / 10^p — fmt() renders it exactly */
+function fmt(m, p) {
+  let s = String(m);
+  if (p === 0) return s;
+  while (s.length <= p) s = "0" + s;
+  s = s.slice(0, s.length - p) + "." + s.slice(s.length - p);
+  s = s.replace(/\.?0+$/, "");
+  return s;
+}
+function fmtFull(m, p) {  // keep trailing zeros (for "count the places" teaching)
+  let s = String(m);
+  if (p === 0) return s;
+  while (s.length <= p) s = "0" + s;
+  return s.slice(0, s.length - p) + "." + s.slice(s.length - p);
+}
+const val = (m, p) => m / Math.pow(10, p);
+function randM(p) {  // mantissa with p decimal places, not ending in 0
+  let m;
+  do { m = rnd(p === 1 ? 11 : 101, p === 1 ? 99 : 999); } while (m % 10 === 0);
+  return m;
+}
+
+/* ================= question generators =================
+   kind "dec": typed decimal answer {ansM, ansP}; kind "mc": options, o[0] correct */
+function decQ(t, text, mathTxt, ansM, ansP, why) {
+  return { t, kind: "dec", text, mathTxt, ansM, ansP, ans: val(ansM, ansP), ansText: fmt(ansM, ansP), why };
+}
+
+function qMultWhole() {
+  const p = rnd(1, 2), m = randM(p), w = rnd(2, 9);
+  const a = fmt(m, p);
+  return decQ("× by whole numbers", "Multiply.", `${a} × ${w} = ?`,
+    m * w, p,
+    `Ignore the decimal: ${m} × ${w} = ${m * w}. There ${p === 1 ? "is 1 decimal place" : "are " + p + " decimal places"} in ${a}, so place the point ${p} place${p > 1 ? "s" : ""} in: ${fmtFull(m * w, p)}${fmt(m * w, p) !== fmtFull(m * w, p) ? " = " + fmt(m * w, p) : ""}.`);
+}
+function qMultDec() {
+  const p1 = 1, m1 = randM(1);
+  const p2 = rnd(1, 2), m2 = randM(p2);
+  const a = fmt(m1, p1), b = fmt(m2, p2);
+  return decQ("× decimals by decimals", "Multiply.", `${a} × ${b} = ?`,
+    m1 * m2, p1 + p2,
+    `Ignore the decimals: ${m1} × ${m2} = ${m1 * m2}. Count the places: ${p1} in ${a} + ${p2} in ${b} = ${p1 + p2} total. Place the point: ${fmtFull(m1 * m2, p1 + p2)}${fmt(m1 * m2, p1 + p2) !== fmtFull(m1 * m2, p1 + p2) ? " = " + fmt(m1 * m2, p1 + p2) : ""}.`);
+}
+function qPowRight() {
+  const zeros = rnd(1, 3), pow = Math.pow(10, zeros);
+  const p = rnd(Math.max(1, zeros - 1), 3), m = randM(Math.min(p, 2) ) * (p === 3 ? 10 : 1) + (p === 3 ? rnd(1,9) : 0);
+  const mm = p === 3 ? randM(2) * 10 + rnd(1, 9) : randM(p);
+  const newP = Math.max(0, p - zeros);
+  const ansM = p >= zeros ? mm : mm * Math.pow(10, zeros - p);
+  return decQ("× by powers of 10", "Multiply. (Hint: which way does the point move?)", `${fmt(mm, p)} × ${pow} = ?`,
+    ansM, newP,
+    `${pow} has ${zeros} zero${zeros > 1 ? "s" : ""} → move the decimal point ${zeros} place${zeros > 1 ? "s" : ""} to the RIGHT: ${fmt(mm, p)} → ${fmt(ansM, newP)}.`);
+}
+function qPowLeft() {
+  const places = rnd(1, 3);
+  const powTxt = places === 1 ? "0.1" : places === 2 ? "0.01" : "0.001";
+  const p = rnd(1, 2), m = randM(p);
+  return decQ("× by 0.1 / 0.01 / 0.001", "Multiply. (Careful: decimal powers of 10 move the point the OTHER way!)", `${fmt(m, p)} × ${powTxt} = ?`,
+    m, p + places,
+    `${powTxt} has ${places} decimal place${places > 1 ? "s" : ""} → move the point ${places} place${places > 1 ? "s" : ""} to the LEFT: ${fmt(m, p)} → ${fmt(m, p + places)}.`);
+}
+function qDivWhole() {
+  const p = rnd(1, 3), mq = randM(Math.min(p, 2)) * (p === 3 ? 10 : 1) + (p === 3 ? rnd(1, 9) : 0);
+  const q = p === 3 ? randM(2) * 10 + rnd(1, 9) : randM(p);
+  const w = rnd(2, 9);
+  const dividendM = q * w;
+  return decQ("÷ by whole numbers", "Divide.", `${fmt(dividendM, p)} ÷ ${w} = ?`,
+    q, p,
+    `Place the decimal in the quotient right above the one in ${fmt(dividendM, p)}, then divide as usual: ${dividendM} ÷ ${w} = ${q}. Answer: ${fmt(q, p)}.`);
+}
+function qDivDec() {
+  const dp = rnd(1, 2);
+  const dvM = dp === 1 ? rnd(2, 9) : rnd(11, 49);
+  const qp = rnd(0, 1);
+  const qM = qp === 0 ? rnd(3, 40) : randM(1);
+  const dividendM = qM * dvM, dividendP = dp + qp;
+  const shiftedDividend = fmt(dividendM, qp);
+  return decQ("÷ decimals by decimals", "Divide.", `${fmt(dividendM, dividendP)} ÷ ${fmt(dvM, dp)} = ?`,
+    qM, qp,
+    `Make the divisor whole: move BOTH decimal points ${dp} place${dp > 1 ? "s" : ""} right → ${shiftedDividend} ÷ ${dvM}. Now divide: the answer is ${fmt(qM, qp)}.`);
+}
+function qDivPow() {
+  const zeros = rnd(1, 3), pow = Math.pow(10, zeros);
+  const p = rnd(1, 2), m = randM(p);
+  return decQ("÷ by powers of 10", "Divide. (Hint: which way does the point move?)", `${fmt(m, p)} ÷ ${pow} = ?`,
+    m, p + zeros,
+    `Dividing by ${pow} (${zeros} zero${zeros > 1 ? "s" : ""}) → move the decimal point ${zeros} place${zeros > 1 ? "s" : ""} to the LEFT: ${fmt(m, p)} → ${fmt(m, p + zeros)}.`);
+}
+function qWordMult() {
+  const r = randM(1), t = randM(1);
+  const tpl = pick([
+    ["A race car travels ", " miles every minute. How far does it go in ", " minutes?", "miles"],
+    ["Grapes cost $", " per pound. How much do ", " pounds cost?", "dollars"],
+    ["A robot walks ", " meters each second. How far in ", " seconds?", "meters"],
+  ]);
+  return decQ("Word problems", `${tpl[0]}${fmt(r, 1)}${tpl[1]}${fmt(t, 1)}${tpl[2]} (Answer in ${tpl[3]}.)`,
+    `${fmt(r, 1)} × ${fmt(t, 1)} = ?`,
+    r * t, 2,
+    `It's a MULTIPLY problem: ${fmt(r, 1)} × ${fmt(t, 1)}. Ignore decimals: ${r} × ${t} = ${r * t}; two decimal places total → ${fmtFull(r * t, 2)}${fmt(r * t, 2) !== fmtFull(r * t, 2) ? " = " + fmt(r * t, 2) : ""} ${tpl[3]}.`);
+}
+function qWordDiv() {
+  const n = rnd(2, 6), qM = randM(2);
+  const totalM = qM * n;
+  const tpl = pick([
+    ["A ", "-pound bag of rice is split into ", " equal containers. How much is in each?", "pounds"],
+    ["", " liters of juice are poured equally into ", " bottles. How much per bottle?", "liters"],
+    ["$", " is shared equally by ", " kids. How much does each kid get?", "dollars"],
+  ]);
+  return decQ("Word problems", `${tpl[0]}${fmt(totalM, 2)}${tpl[1]}${n}${tpl[2]} (Answer in ${tpl[3]}.)`,
+    `${fmt(totalM, 2)} ÷ ${n} = ?`,
+    qM, 2,
+    `It's a DIVIDE problem: ${fmt(totalM, 2)} ÷ ${n}. Decimal goes straight up into the quotient: ${totalM} ÷ ${n} = ${qM} → ${fmt(qM, 2)} ${tpl[3]} each.`);
+}
+function qConcept() {
+  const pool = [
+    { q: "When you MULTIPLY by 10, 100, or 1000, the decimal point moves…", o: ["Right — one place per zero", "Left — one place per zero", "It doesn't move", "To the end"], why: "Multiplying by powers of 10 makes the number BIGGER → point moves right." },
+    { q: "When you DIVIDE by 10, 100, or 1000, the decimal point moves…", o: ["Left — one place per zero", "Right — one place per zero", "It disappears", "It doubles"], why: "Dividing by powers of 10 makes the number SMALLER → point moves left." },
+    { q: "When you multiply by 0.1, 0.01, or 0.001, the decimal point moves…", o: ["Left — one place per decimal place", "Right — one place per zero", "Nowhere", "Up"], why: "Multiplying by a number LESS than 1 makes it smaller → left. (0.01 = 2 places left.)" },
+    { q: "You multiply 2.4 × 3.5 (one decimal place each). How many decimal places go in the product?", o: ["2 — add the places from both factors", "1", "0", "4"], why: "Count the places in BOTH factors and add: 1 + 1 = 2. (24 × 35 = 840 → 8.40.)" },
+    { q: "First step when dividing BY a decimal, like 5.76 ÷ 0.24:", o: ["Move both decimal points right until the divisor is whole", "Just ignore the decimals forever", "Round everything first", "Flip the fraction"], why: "Make the divisor whole — 0.24 → 24 — and move the dividend's point the SAME amount: 576 ÷ 24 = 24." },
+    { q: "When dividing a decimal by a WHOLE number, the decimal point in the answer goes…", o: ["Straight up — directly above the one in the dividend", "At the very end", "Wherever it fits", "It's removed"], why: "Line it up: the quotient's point sits right above the dividend's point. Then divide as usual." },
+  ];
+  return Object.assign({ t: "Rules", kind: "mc" }, pick(pool));
+}
+
+function buildQuiz() {
+  return [
+    qMultWhole(), qMultWhole(), qMultDec(), qMultDec(),
+    qPowRight(), qPowLeft(), qConcept(),
+    qDivWhole(), qDivWhole(), qDivDec(), qDivDec(), qDivPow(),
+    qWordMult(), qWordDiv(),
+  ];
+}
+const QUIZ_LEN = 14;
+
+/* ================= storage (same pattern as the other apps) ================= */
+const KEY = "decimal-dash-history";
+const API = "/api/scores";
+let apiSynced = false;
+
+function loadLocal() {
+  try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; }
+}
+function saveLocal(h) {
+  try { localStorage.setItem(KEY, JSON.stringify(h)); } catch {}
+}
+function loadHistory() { return loadLocal(); }
+function postRecord(rec) {
+  return fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(rec) });
+}
+function addRecord(rec) {
+  const h = loadLocal(); h.push(rec); saveLocal(h);
+  postRecord(rec).catch(() => {});
+}
+function clearHistory() {
+  saveLocal([]);
+  if (apiSynced) fetch(API, { method: "DELETE" }).catch(() => {});
+}
+async function syncApi() {
+  try {
+    const res = await fetch(API);
+    if (!res.ok) throw new Error();
+    const server = await res.json();
+    if (!Array.isArray(server)) throw new Error();
+    const seen = new Set(server.map(r => r.id || r.date));
+    const missing = loadLocal().filter(r => !seen.has(r.id || r.date));
+    for (const r of missing) { try { await postRecord(r); } catch {} }
+    const merged = server.concat(missing).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    saveLocal(merged);
+    apiSynced = true;
+    if (state.screen === "home" || state.screen === "history") render();
+  } catch { apiSynced = false; }
+}
+
+/* ================= state ================= */
+const app = document.getElementById("app");
+const navBtn = document.getElementById("navBtn");
+let state = { screen: "home", quiz: [], idx: 0, right: 0, misses: [], locked: false };
+let timers = [];
+function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+
+function go(screen) {
+  clearTimers();
+  state.screen = screen;
+  if (screen === "home" || screen === "history") syncApi();
+  render();
+  window.scrollTo(0, 0);
+}
+
+navBtn.addEventListener("click", () => {
+  if (state.screen === "quiz") {
+    if (confirm("Quit this quiz? It won't be scored.")) go("home");
+  } else if (state.screen === "home") {
+    go("history");
+  } else {
+    go("home");
+  }
+});
+
+function pctClass(p) { return p >= 90 ? "pct-good" : p >= 70 ? "pct-mid" : "pct-low"; }
+
+function startQuiz() {
+  state.quiz = shuffle(buildQuiz());
+  state.idx = 0;
+  state.right = 0;
+  state.misses = [];
+  go("quiz");
+}
+
+function render() {
+  navBtn.textContent = state.screen === "quiz" ? "Quit" : state.screen === "home" ? "History" : "Home";
+  if (state.screen === "home") renderHome();
+  else if (state.screen === "quiz") renderQuiz();
+  else if (state.screen === "results") renderResults();
+  else if (state.screen === "study") renderStudy();
+  else renderHistory();
+}
+
+function renderHome() {
+  const h = loadHistory();
+  const best = h.length ? Math.max(...h.map(r => r.percent)) : null;
+  const avg = h.length ? Math.round(h.reduce((a, r) => a + r.percent, 0) / h.length) : null;
+  app.innerHTML = `
+    <div class="card hero">
+      <h1>Dash through decimals, Ava! 🏁</h1>
+      <p>Every quiz is ${QUIZ_LEN} freshly generated problems from your whole study guide — new numbers every single time, so it's never the same quiz twice.</p>
+      <ul class="topic-list">
+        <li>× whole numbers</li><li>× decimals</li><li>× and ÷ by 10/100/1000</li><li>× by 0.1/0.01</li><li>÷ whole numbers</li><li>÷ decimals</li><li>Word problems</li>
+      </ul>
+      <div class="btn-row"><button class="btn btn-primary btn-wide" id="startBtn">Start a practice quiz</button></div>
+      <div class="btn-row"><button class="btn btn-wide" id="studyBtn">Read the cheat sheet</button></div>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="num mono">${h.length}</div><div class="lbl">Quizzes</div></div>
+      <div class="stat"><div class="num mono">${best === null ? "–" : best + "%"}</div><div class="lbl">Best</div></div>
+      <div class="stat"><div class="num mono">${avg === null ? "–" : avg + "%"}</div><div class="lbl">Average</div></div>
+    </div>`;
+  document.getElementById("startBtn").addEventListener("click", startQuiz);
+  document.getElementById("studyBtn").addEventListener("click", () => go("study"));
+}
+
+function advance() {
+  clearTimers();
+  state.idx++;
+  if (state.idx >= state.quiz.length) finishQuiz();
+  else render();
+}
+
+function renderQuiz() {
+  const q = state.quiz[state.idx];
+  const n = state.quiz.length;
+  const isMC = q.kind === "mc";
+
+  let answerHTML;
+  let opts = [];
+  if (isMC) {
+    opts = shuffle(q.o.map((text, i) => ({ text, correct: i === 0 })));
+    answerHTML = `<div class="opts">${opts.map((o, i) =>
+      `<button class="opt" data-i="${i}">${esc(o.text)}</button>`).join("")}</div>`;
+  } else {
+    answerHTML = `<div class="answer-line">
+        <input class="answer" id="ansInput" type="text" inputmode="decimal" autocomplete="off" placeholder="Type your answer (use a . for the decimal)" aria-label="Your answer">
+        <button class="btn btn-primary" id="checkBtn">Check</button>
+      </div>`;
+  }
+
+  app.innerHTML = `
+    <div class="progress">
+      <div class="label"><span>Problem ${state.idx + 1} of ${n}</span><span>${esc(q.t)}</span></div>
+      <div class="bar"><div style="width:${((state.idx + 1) / n) * 100}%"></div></div>
+    </div>
+    <div class="card">
+      <div class="qtopic">${esc(q.t)}</div>
+      ${isMC ? `<p class="qtext" style="font-weight:700;font-size:19px">${esc(q.q)}</p>`
+             : `<p class="qtext">${esc(q.text)}</p><div class="qmath">${esc(q.mathTxt)}</div>`}
+      ${answerHTML}
+      <div class="feedback neutral" id="feedback">${isMC ? "Tap the best answer." : "Line up your places — then type the exact answer."}</div>
+    </div>`;
+
+  const feedback = document.getElementById("feedback");
+
+  if (isMC) {
+    const showWhy = ok => {
+      feedback.className = "feedback " + (ok ? "right" : "wrong");
+      feedback.innerHTML = (ok ? "Correct! ✓" : `Not quite — the answer is <b>${esc(q.o[0])}</b>.`) +
+        `<span class="why">${esc(q.why)}</span>` +
+        (ok ? "" : ` <button class="navlink" id="nextBtn">Next →</button>`);
+      if (!ok) document.getElementById("nextBtn").addEventListener("click", advance);
+    };
+    app.querySelectorAll(".opt").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (state.locked) return;
+        state.locked = true;
+        const chosen = opts[Number(btn.dataset.i)];
+        app.querySelectorAll(".opt").forEach((b, i) => {
+          b.disabled = true;
+          if (opts[i].correct) b.classList.add("right");
+          else if (b === btn) b.classList.add("wrong");
+          else b.classList.add("dim");
+        });
+        if (chosen.correct) {
+          state.right++;
+          showWhy(true);
+          later(() => { state.locked = false; advance(); }, 1500);
+        } else {
+          state.misses.push({ q: q.q, a: chosen.text, c: q.o[0] });
+          showWhy(false);
+          state.locked = false;
+        }
+      });
+    });
+  } else {
+    const input = document.getElementById("ansInput");
+    const checkBtn = document.getElementById("checkBtn");
+    const submit = () => {
+      if (state.locked) return;
+      const raw = input.value.trim().replace(/,/g, ".").replace(/[^0-9.]/g, "");
+      if (!raw) { input.focus(); return; }
+      const user = Number(raw);
+      if (!isFinite(user)) { input.focus(); return; }
+      state.locked = true;
+      input.disabled = checkBtn.disabled = true;
+      const ok = Math.abs(user - q.ans) < 1e-9;
+      if (ok) {
+        state.right++;
+        feedback.className = "feedback right";
+        feedback.innerHTML = `Correct! ✓ <span class="why">${esc(q.why)}</span>`;
+        later(() => { state.locked = false; advance(); }, 1500);
+      } else {
+        state.misses.push({ q: q.mathTxt !== undefined ? q.mathTxt + (q.t === "Word problems" ? "  (" + q.text + ")" : "") : q.text, a: raw, c: q.ansText });
+        feedback.className = "feedback wrong";
+        feedback.innerHTML = `Not quite — the answer is <b class="mono">${esc(q.ansText)}</b>.` +
+          `<span class="why">${esc(q.why)}</span> <button class="navlink" id="nextBtn">Next →</button>`;
+        document.getElementById("nextBtn").addEventListener("click", advance);
+      }
+    };
+    checkBtn.addEventListener("click", submit);
+    input.addEventListener("keydown", e => { if (e.key === "Enter") submit(); });
+  }
+  state.locked = false;
+}
+
+function finishQuiz() {
+  clearTimers();
+  const total = state.quiz.length;
+  const percent = Math.round((state.right / total) * 100);
+  const rec = {
+    id: Date.now() + "-" + Math.random().toString(36).slice(2, 8),
+    date: new Date().toISOString(),
+    right: state.right, total, percent,
+    misses: state.misses.map(m => ({ q: String(m.q).slice(0, 190), a: String(m.a).slice(0, 70), c: String(m.c).slice(0, 110) })),
+  };
+  addRecord(rec);
+  state.lastResult = rec;
+  go("results");
+}
+
+function missListHTML(misses) {
+  return misses.length
+    ? `<ul class="misslist">${misses.map(m =>
+        `<li><span class="q">${esc(m.q)}</span>
+         <span class="a">${esc(m.a)}</span> → <span class="cor">${esc(m.c)}</span></li>`).join("")}</ul>`
+    : `<div class="allgood">Nothing missed — a perfect dash!</div>`;
+}
+
+function renderResults() {
+  const r = state.lastResult;
+  const msg = r.percent === 100 ? "Perfect! Checkered flag! \u{1F3C1}\u{1F3C6}"
+    : r.percent >= 90 ? "Zooming — you're ready for this test!"
+    : r.percent >= 70 ? "Nice laps — review the misses below."
+    : "Pit stop — read the cheat sheet, then race again.";
+  app.innerHTML = `
+    <div class="card score-hero">
+      <div class="score-big mono" style="color:${r.percent >= 90 ? "var(--good)" : r.percent >= 70 ? "var(--teal)" : "var(--bad)"}">${r.right}/${r.total}</div>
+      <div class="score-msg">${msg}</div>
+      <div class="score-sub">${r.percent}% · saved to history</div>
+      <div class="btn-row">
+        <button class="btn" id="studyBtn">Cheat sheet</button>
+        <button class="btn btn-primary" id="againBtn">New quiz</button>
+      </div>
+    </div>
+    <div class="card">
+      <h2 style="font-size:18px">${r.misses.length ? "What you missed" : "Clean sheet"}</h2>
+      ${missListHTML(r.misses)}
+    </div>`;
+  document.getElementById("againBtn").addEventListener("click", startQuiz);
+  document.getElementById("studyBtn").addEventListener("click", () => go("study"));
+  if (r.percent >= 90) confetti();
+}
+
+function renderHistory() {
+  const h = loadHistory().slice().reverse();
+  const missCount = {};
+  h.forEach(r => (r.misses || []).forEach(m => { missCount[m.q] = (missCount[m.q] || 0) + 1; }));
+  const worst = Object.entries(missCount).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const maxMiss = worst.length ? worst[0][1] : 1;
+
+  const rows = h.map(r => {
+    const d = new Date(r.date);
+    const date = d.toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+    const time = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+    return `<details class="hrow">
+        <summary>
+          <div class="hdate">${date}<small>${time}</small></div>
+          <span class="hscore">${r.right}/${r.total}</span>
+          <span class="hpct ${pctClass(r.percent)}">${r.percent}%</span>
+        </summary>
+        <div class="hdetail">${missListHTML(r.misses || [])}</div>
+      </details>`;
+  }).join("");
+
+  app.innerHTML = `
+    <div class="card">
+      <h2 style="font-size:19px">Quiz history</h2>
+      <p style="color:var(--muted);font-size:14px;margin:6px 0 4px">Tap a quiz to see exactly what was missed.</p>
+      ${h.length ? rows : `<div class="empty">No quizzes yet — take your first one!</div>`}
+    </div>
+    ${worst.length ? `<div class="card trouble"><h2 style="font-size:19px">Trouble problems</h2>
+      <p style="color:var(--muted);font-size:14px;margin:6px 0 10px">Missed most often — drill these before the test.</p>
+      ${worst.map(([qq, nn]) =>
+        `<div class="tlabel"><span style="max-width:75%">${esc(qq)}</span><span class="mono">${nn}×</span></div>
+         <div class="tbar"><div style="width:${(nn / maxMiss) * 100}%"></div></div>`).join("")}</div>` : ""}
+    <div class="btn-row"><button class="btn btn-primary btn-wide" id="startBtn">Start a practice quiz</button></div>
+    ${h.length ? `<div class="btn-row"><button class="btn btn-danger btn-wide" id="clearBtn">Clear history</button></div>` : ""}
+    <p class="footnote">${apiSynced
+      ? "Scores sync — open this same link on any phone or computer to see them."
+      : "History is saved on this device."}</p>`;
+
+  document.getElementById("startBtn").addEventListener("click", startQuiz);
+  const clearBtn = document.getElementById("clearBtn");
+  if (clearBtn) clearBtn.addEventListener("click", () => {
+    if (confirm("Delete all saved scores? This can't be undone.")) { clearHistory(); render(); }
+  });
+}
+
+function renderStudy() {
+  app.innerHTML = `
+    <div class="card study">
+      <h2 style="font-size:20px;margin-bottom:4px">The decimal cheat sheet</h2>
+      <h3>Multiplying decimals (the 3 steps)</h3>
+      <ul>
+        <li><b>1. Ignore</b> the decimals — multiply like whole numbers.</li>
+        <li><b>2. Count</b> the decimal places in BOTH factors and add them.</li>
+        <li><b>3. Place</b> the point that many places in. <span class="em">2.4 × 3.5 → 24 × 35 = 840 → two places → 8.40 = 8.4</span></li>
+      </ul>
+      <h3>The point-moving rules (×/÷ by 10, 100, 1000)</h3>
+      <ul>
+        <li><b>× 10/100/1000</b> → bigger → point moves <span class="em">RIGHT</span>, one place per zero. 4.56 × 100 = 456</li>
+        <li><b>÷ 10/100/1000</b> → smaller → point moves <span class="em">LEFT</span>. 78.4 ÷ 100 = 0.784</li>
+        <li><b>× 0.1/0.01/0.001</b> → also smaller → point moves <span class="em">LEFT</span>, one place per decimal place. 4.56 × 0.1 = 0.456</li>
+      </ul>
+      <h3>Dividing by a WHOLE number</h3>
+      <ul>
+        <li>Pop the decimal point <b>straight up</b> into the quotient, then divide as usual. 7.2 ÷ 3 = 2.4</li>
+      </ul>
+      <h3>Dividing by a DECIMAL</h3>
+      <ul>
+        <li><b>Make the divisor whole</b>: move its point right until it's a whole number — and move the dividend's point the <b>same</b> number of places. <span class="em">5.76 ÷ 0.24 → 576 ÷ 24 = 24</span></li>
+      </ul>
+      <h3>Word problems</h3>
+      <ul>
+        <li>“How far / how much in N of them” → <b>MULTIPLY</b> (1.6 miles per minute × 3.5 minutes = 5.6).</li>
+        <li>“Split equally / each / per” → <b>DIVIDE</b> (5.25 lb ÷ 3 containers = 1.75 lb each).</li>
+      </ul>
+      <div class="btn-row"><button class="btn btn-primary btn-wide" id="startBtn">I'm ready — quiz me</button></div>
+    </div>`;
+  document.getElementById("startBtn").addEventListener("click", startQuiz);
+}
+
+/* ================= confetti ================= */
+function confetti() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const cv = document.getElementById("confetti");
+  cv.hidden = false;
+  cv.width = innerWidth; cv.height = innerHeight;
+  const ctx = cv.getContext("2d");
+  const colors = ["#E0558B", "#12A5A5", "#F2C14E", "#F082AA", "#FFFFFF"];
+  const bits = Array.from({ length: 120 }, () => ({
+    x: Math.random() * cv.width, y: -20 - Math.random() * cv.height * 0.5,
+    vy: 2 + Math.random() * 3, vx: -1 + Math.random() * 2,
+    s: 5 + Math.random() * 6, r: Math.random() * Math.PI, vr: -0.1 + Math.random() * 0.2,
+    col: colors[Math.floor(Math.random() * colors.length)],
+  }));
+  let frames = 0;
+  (function loop() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    for (const b of bits) {
+      b.x += b.vx; b.y += b.vy; b.r += b.vr;
+      ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.r);
+      ctx.fillStyle = b.col; ctx.fillRect(-b.s / 2, -b.s / 2, b.s, b.s * 0.6);
+      ctx.restore();
+    }
+    if (++frames < 220) requestAnimationFrame(loop);
+    else { ctx.clearRect(0, 0, cv.width, cv.height); cv.hidden = true; }
+  })();
+}
+
+render();
+syncApi();
+</script>
+</body>
+</html>
